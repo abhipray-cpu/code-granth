@@ -22,7 +22,7 @@ const router = createRouter({
     },
     {
       name: 'code',
-      path: '/code',
+      path: '/code/:code',
       component: CodePage
     },
     {
@@ -32,7 +32,7 @@ const router = createRouter({
     },
     {
       name: 'feature',
-      path: '/feature',
+      path: '/feature/:language/:feature',
       component: FeaturePage
     },
     {

@@ -15,23 +15,23 @@
       Languages
     </h2>
     <div class="flex flex-row overflow-x-auto bar pl-3 pr-3 w-screen gap-4">
-      <div class="flex flex-col items-center flex-shrink-0">
+      <div class="flex flex-col items-center flex-shrink-0" @click="langRedirect('JavaScript')">
         <img src="../assets/language/js.png" alt="JS" class="h-30 w-30 rounded-2xl image-shadow" />
         <h4 class="mt-2 text-lg font-inter font-normal text-gray-700">JavaScript</h4>
       </div>
-      <div class="flex flex-col items-center flex-shrink-0">
+      <div class="flex flex-col items-center flex-shrink-0" @click="langRedirect('TypeScript')">
         <img src="../assets/language/ts.png" alt="TS" class="h-30 w-30 rounded-2xl image-shadow" />
         <h4 class="mt-2 text-lg font-inter font-normal text-gray-700">TypeScript</h4>
       </div>
-      <div class="flex flex-col items-center flex-shrink-0">
+      <div class="flex flex-col items-center flex-shrink-0" @click="langRedirect('Python')">
         <img src="../assets/language/py.png" alt="py" class="h-30 w-30 rounded-2xl image-shadow" />
         <h4 class="mt-2 text-lg font-inter font-normal text-gray-700">Python</h4>
       </div>
-      <div class="flex flex-col items-center flex-shrink-0">
+      <div class="flex flex-col items-center flex-shrink-0" @click="langRedirect('Go')">
         <img src="../assets/language/go.png" alt="go" class="h-30 w-30 rounded-2xl image-shadow" />
         <h4 class="mt-2 text-lg font-inter font-normal text-gray-700">Golang</h4>
       </div>
-      <div class="flex flex-col items-center flex-shrink-0">
+      <div class="flex flex-col items-center flex-shrink-0" @click="langRedirect('Dart')">
         <img
           src="../assets/language/dart.png"
           alt="dart"
@@ -42,6 +42,7 @@
     </div>
     <h2
       class="mt-8 ml-5 text-2xl text-gray-600 font-primary font-medium tracking-wide self-start mb-4"
+      @click="redirect('ds')"
     >
       Data Structures
     </h2>
@@ -89,6 +90,7 @@
     </div>
     <h2
       class="mt-8 ml-5 text-2xl text-gray-600 font-primary font-medium tracking-wide self-start mb-4"
+      @click="redirect('algo')"
     >
       Algorithms
     </h2>
@@ -191,11 +193,21 @@ export default {
   },
   setup() {
     const router = useRouter()
+    const langRedirect = (value) => {
+      router.push({ name: 'language', params: { language: value } })
+    }
+    const redirect = (value) => {
+      router.push({ name: value })
+    }
     onMounted(() => {
       if (!isTokenValid()) {
         router.push({ name: 'home' })
       }
     })
+    return {
+      langRedirect,
+      redirect
+    }
   }
 }
 </script>
