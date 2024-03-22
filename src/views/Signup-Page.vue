@@ -54,26 +54,32 @@
       />
       <div
         class="w-60 h-14 flex flex-col items-center justify-center bg-blue-500 mt-6 rounded-xl button-shadow text-white text-2xl font-bold font-inter"
+        @click="submit"
       >
         Signup
       </div>
-      <span class="absolute bottom-10 text-lg font-cursive font-inter"
+      <span class="fixed bottom-2 text-lg font-cursive font-inter"
         >Already have an account?
         <strong class="text-2xl font-inter" @click="redirect">Login</strong>
       </span>
     </div>
+    <modal-comp :type="Type" v-if="Modal"></modal-comp>
   </div>
 </template>
 
 <script>
 import { useRouter } from 'vue-router'
-import { ref } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import MaleComp from '../components/Male-Comp.vue'
 import FemaleComp from '../components/Female-Comp.vue'
+import { isTokenValid } from '../utiils/authorization'
+import { useStore } from 'vuex'
+import ModalComp from '../components/Modal-Comp.vue'
 export default {
   components: {
     MaleComp,
-    FemaleComp
+    FemaleComp,
+    ModalComp
   },
   setup() {
     const router = useRouter()
@@ -82,16 +88,71 @@ export default {
     const email = ref('')
     const password = ref('')
     const confirm = ref('')
+    const type = ref('')
+    const modal = ref(false)
+    const Type = computed(() => {
+      return type.value
+    })
+    const Modal = computed(() => {
+      return modal.value
+    })
+    const store = useStore()
+    const submit = async () => {
+      gender.value = store.getters['getGender']
+      if (
+        name.value === '' ||
+        email.value === '' ||
+        password.value === '' ||
+        confirm.value === '' ||
+        gender.value === ''
+      ) {
+        alert('Please fill all details')
+        return
+      }
+      if (password.value.length < 8) {
+        alert('Password must be at least 8 characters')
+        return
+      }
+      if (password.value !== confirm.value) {
+        alert('Password do not match')
+        return
+      }
+      type.value = 'loader'
+      modal.value = true
+      let data = await store.dispatch('signup', {
+        name: name.value,
+        email: email.value,
+        password: password.value,
+        gender: gender.value
+      })
+      modal.value = false
+      if (data.error) {
+        type.value = 'error'
+        modal.value = true
+        setTimeout(() => {
+          modal.value = false
+        }, 1500)
+      }
+      router.push({ name: 'home' })
+    }
     const redirect = () => {
       router.push({ name: 'login' })
     }
+    onMounted(() => {
+      if (isTokenValid()) {
+        router.push({ name: 'home' })
+      }
+    })
     return {
       redirect,
       gender,
       name,
       email,
       password,
-      confirm
+      confirm,
+      submit,
+      Type,
+      Modal
     }
   }
 }

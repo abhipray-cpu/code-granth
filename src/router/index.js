@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import AlgoPage from '../views/Algo-Page.vue'
-import CodePage from '../views/Code-Page.vue'
+import DsCode from '../views/Ds-Code.vue'
+import AlgoCode from '../views/Alog-Code.vue'
 import DsPage from '../views/Ds-page.vue'
 import FeaturePage from '../views/Feature-Page.vue'
 import HomePage from '../views/Home-Page.vue'
@@ -8,6 +9,9 @@ import LoginPage from '../views/Login-Page.vue'
 import SignupPage from '../views/Signup-Page.vue'
 import TrickPage from '../views/Trick-Page.vue'
 import LanguagePage from '../views/Language-Page.vue'
+import NotFound from '../views/Not-Found.vue'
+import InterviewQuestions from '@/views/Interview-Questions.vue'
+import LangFeatures from '../views/Lang-Features.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -21,9 +25,14 @@ const router = createRouter({
       component: AlgoPage
     },
     {
-      name: 'code',
-      path: '/code/:code',
-      component: CodePage
+      name: 'dsCode',
+      path: '/dscode/:code/',
+      component: DsCode
+    },
+    {
+      name: 'algoCode',
+      path: '/algocode/:code',
+      component: AlgoCode
     },
     {
       name: 'ds',
@@ -59,6 +68,24 @@ const router = createRouter({
       name: 'language',
       path: '/language/:language',
       component: LanguagePage
+    },
+    {
+      name: 'interview',
+      path: '/interview/:language',
+      component: InterviewQuestions
+    },
+    {
+      name: 'langFeatures',
+      path: '/langFeatures/:language',
+      component: LangFeatures
+    },
+    {
+      path: '/404',
+      component: NotFound
+    },
+    {
+      path: '/:catchAll(.*)',
+      redirect: '/404'
     }
   ]
 })

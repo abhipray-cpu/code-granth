@@ -23,7 +23,6 @@
         ></path>
       </g>
     </svg>
-
     <div class="flex flex-col items-center -mt-8">
       <img
         src="../assets/language/js.png"
@@ -59,44 +58,15 @@
         {{ language }}
       </h2>
     </div>
-
-    <div class="w-[94vw] ml-[3vw] mr-[3vw] mt-5">
-      <h2 class="font-primary text-2xl font-normal text-gray-700 ml-1">Description</h2>
-      <span class="font-inter text-md text-gray-600 mt-2 w-[92vw] ml-[1vw]">
-        {{ Paragraph.paragraph }}
-        <h4 class="text-blue-400 font-inter font-medium tracking-normal text-lg" @click="toggle">
-          {{ Paragraph.state === 0 ? 'show more' : 'show less' }}
-        </h4>
-      </span>
-      <h2 class="font-primary text-2xl font-normal text-gray-700 ml-1 mt-5">Working</h2>
-      <span class="font-inter text-md text-gray-600 mt-2 w-[92vw] ml-[1vw]">
-        {{ Working.working }}
-        <h4
-          class="text-blue-400 font-inter font-medium tracking-normal text-lg"
-          @click="toggleWorking"
-        >
-          {{ Working.state === 0 ? 'show more' : 'show less' }}
-        </h4>
-      </span>
-    </div>
-
-    <div class="w-screen flex flex-col items-center mt-7">
-      <div
-        class="w-[96vw] h-14 rounded-xl bg-blue-500 flex flex-col justify-center items-center pt-3 pb-3 mb-6"
-        @click="interview"
-      >
-        <h2 class="text-3xl text-white font-primary font-medium tracking-wide">
-          Interview Questions
-        </h2>
-      </div>
-      <div
-        class="w-[96vw] h-14 rounded-xl bg-blue-500 flex flex-col justify-center items-center pt-3 pb-3"
-        @click="featureRedirect"
-      >
-        <h2 class="text-3xl text-white font-primary font-medium tracking-wide">Features</h2>
+    <div class="w-screen mt-5 flex flex-col items-center">
+      <div v-for="(feature, index) in Features" :key="index">
+        <feature-card
+          :title="feature.title"
+          :code="feature.syntax"
+          :language="language"
+        ></feature-card>
       </div>
     </div>
-
     <modal-comp :type="Type" v-if="Modal"></modal-comp>
   </div>
 </template>
@@ -106,16 +76,13 @@ import { useRouter, useRoute } from 'vue-router'
 import { ref, onMounted, computed } from 'vue'
 import ModalComp from '../components/Modal-Comp.vue'
 import { useStore } from 'vuex'
+import FeatureCard from '../components/Feature-Card.vue'
 export default {
-  components: { ModalComp },
+  components: { ModalComp, FeatureCard },
   setup() {
     const router = useRouter()
     const route = useRoute()
     const language = ref('')
-    const expand = ref(0)
-    const para = ref('')
-    const working = ref('')
-    const expandWorking = ref(0)
     const type = ref('')
     const modal = ref(false)
     const features = ref([])
@@ -128,29 +95,36 @@ export default {
     const Features = computed(() => {
       return features.value
     })
-    const Working = computed(() => {
-      if (expandWorking.value == 0) {
-        return { working: working.value.slice(0, 350), state: 0 }
-      } else return { working: working.value, state: 1 }
-    })
-    const Paragraph = computed(() => {
-      if (expand.value === 0) {
-        return { paragraph: para.value.slice(0, 350), state: 0 }
-      }
-      return { paragraph: para.value, state: 1 }
-    })
     const goBack = () => {
       router.push({ name: 'home' })
-    }
-    const interview = () => {
-      router.push({ name: 'interview', params: { language: language.value } })
     }
     const store = useStore()
     onMounted(async () => {
       language.value = route.params.language
       type.value = 'loader'
       modal.value = true
-      const data = await store.dispatch('language', { value: language.value })
+      let value
+      switch (language.value) {
+        case 'Javascript':
+          value = 2
+          break
+        case 'Typescript':
+          value = 3
+          break
+        case 'Python':
+          value = 1
+          break
+        case 'Golang':
+          value = 5
+          break
+        case 'Dart':
+          value = 4
+          break
+        default:
+          value = 0
+          break
+      }
+      const data = await store.dispatch('features', { value: value })
       modal.value = false
       if (data.error) {
         type.value = 'error'
@@ -159,39 +133,16 @@ export default {
           modal.value = false
         }, 1500)
       }
-      para.value = data.result.description
-      working.value = data.result.working
+
+      features.value = data.result
     })
-    const toggle = () => {
-      expand.value = expand.value === 0 ? 1 : 0
-    }
-    const toggleWorking = () => {
-      expandWorking.value = expandWorking.value === 0 ? 1 : 0
-    }
-    const featureRedirect = () => {
-      router.push({ name: 'langFeatures', params: { language: language.value } })
-    }
     return {
       goBack,
       language,
-      Paragraph,
-      toggle,
       Type,
       Modal,
-      Features,
-      Working,
-      toggleWorking,
-      interview,
-      featureRedirect
+      Features
     }
   }
 }
 </script>
-
-<style scoped>
-.icon-shadow {
-  box-shadow:
-    5px 5px 15px #bfbfbf,
-    -5px -5px 15px #ffffff;
-}
-</style>

@@ -29,83 +29,67 @@
     <div class="mt-5 flex flex-col items-center gap-4">
       <div
         class="w-[90vw] bg-blue-500 h-16 rounded-lg shadow flex flex-col items-center justify-center pl-4"
+        v-for="(title, index) in DS"
+        :key="index"
+        @click="redirect(title.title)"
       >
-        <h2 class="text-white text-5xl font-inter font-medium tracking-wider">Array</h2>
-      </div>
-      <div
-        class="w-[90vw] bg-blue-500 h-16 rounded-lg shadow flex flex-col items-center justify-center pl-4"
-      >
-        <h2 class="text-white text-5xl font-inter font-medium tracking-wider">Array</h2>
-      </div>
-      <div
-        class="w-[90vw] bg-blue-500 h-16 rounded-lg shadow flex flex-col items-center justify-center pl-4"
-      >
-        <h2 class="text-white text-5xl font-inter font-medium tracking-wider">Array</h2>
-      </div>
-      <div
-        class="w-[90vw] bg-blue-500 h-16 rounded-lg shadow flex flex-col items-center justify-center pl-4"
-      >
-        <h2 class="text-white text-5xl font-inter font-medium tracking-wider">Array</h2>
-      </div>
-      <div
-        class="w-[90vw] bg-blue-500 h-16 rounded-lg shadow flex flex-col items-center justify-center pl-4"
-      >
-        <h2 class="text-white text-5xl font-inter font-medium tracking-wider">Array</h2>
-      </div>
-      <div
-        class="w-[90vw] bg-blue-500 h-16 rounded-lg shadow flex flex-col items-center justify-center pl-4"
-      >
-        <h2 class="text-white text-5xl font-inter font-medium tracking-wider">Array</h2>
-      </div>
-      <div
-        class="w-[90vw] bg-blue-500 h-16 rounded-lg shadow flex flex-col items-center justify-center pl-4"
-      >
-        <h2 class="text-white text-5xl font-inter font-medium tracking-wider">Array</h2>
-      </div>
-      <div
-        class="w-[90vw] bg-blue-500 h-16 rounded-lg shadow flex flex-col items-center justify-center pl-4"
-      >
-        <h2 class="text-white text-5xl font-inter font-medium tracking-wider">Array</h2>
-      </div>
-      <div
-        class="w-[90vw] bg-blue-500 h-16 rounded-lg shadow flex flex-col items-center justify-center pl-4"
-      >
-        <h2 class="text-white text-5xl font-inter font-medium tracking-wider">Array</h2>
-      </div>
-      <div
-        class="w-[90vw] bg-blue-500 h-16 rounded-lg shadow flex flex-col items-center justify-center pl-4"
-      >
-        <h2 class="text-white text-5xl font-inter font-medium tracking-wider">Array</h2>
-      </div>
-      <div
-        class="w-[90vw] bg-blue-500 h-16 rounded-lg shadow flex flex-col items-center justify-center pl-4"
-      >
-        <h2 class="text-white text-5xl font-inter font-medium tracking-wider">Array</h2>
-      </div>
-      <div
-        class="w-[90vw] bg-blue-500 h-16 rounded-lg shadow flex flex-col items-center justify-center pl-4"
-      >
-        <h2 class="text-white text-5xl font-inter font-medium tracking-wider">Array</h2>
-      </div>
-      <div
-        class="w-[90vw] bg-blue-500 h-16 rounded-lg shadow flex flex-col items-center justify-center pl-4"
-      >
-        <h2 class="text-white text-5xl font-inter font-medium tracking-wider">Array</h2>
+        <h2 class="text-white text-xl font-inter font-medium tracking-wider text-center">
+          {{ title.title }}
+        </h2>
       </div>
     </div>
+    <modal-comp :type="Type" v-if="Modal"></modal-comp>
   </div>
 </template>
 
 <script>
 import { useRouter } from 'vue-router'
+import { ref, onMounted, computed } from 'vue'
+import { useStore } from 'vuex'
+import ModalComp from '../components/Modal-Comp.vue'
 export default {
+  components: { ModalComp },
   setup() {
     const router = useRouter()
+    const type = ref('')
+    const modal = ref(false)
+    const ds = ref([])
+    const Type = computed(() => {
+      return type.value
+    })
+    const Modal = computed(() => {
+      return modal.value
+    })
+    const DS = computed(() => {
+      return ds.value
+    })
     const goBack = () => {
       router.go(-1)
     }
+    const redirect = (val) => {
+      router.push({ name: 'algoCode', params: { code: val } })
+    }
+    const store = useStore()
+    onMounted(async () => {
+      type.value = 'loader'
+      modal.value = true
+      const data = await store.dispatch('Algorithm')
+      modal.value = false
+      if (data.error) {
+        type.value = 'error'
+        modal.value = true
+        setTimeout(() => {
+          modal.value = false
+        }, 1500)
+      }
+      ds.value = data.result
+    })
     return {
-      goBack
+      goBack,
+      Type,
+      Modal,
+      DS,
+      redirect
     }
   }
 }

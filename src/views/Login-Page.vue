@@ -20,6 +20,7 @@
       />
       <div
         class="w-60 h-14 flex flex-col items-center justify-center bg-blue-500 mt-6 rounded-xl button-shadow text-white text-2xl font-bold font-inter"
+        @click="submit"
       >
         Login
       </div>
@@ -28,32 +29,67 @@
         <strong class="text-2xl font-inter" @click="redirect">Signup</strong>
       </span>
     </div>
+    <modal-comp :type="Type" v-if="Modal"></modal-comp>
   </div>
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { Vue3Lottie } from 'vue3-lottie'
 import BookJSON from '../assets/lottie/book.json'
 import { useRouter } from 'vue-router'
+import { isTokenValid } from '../utiils/authorization'
+import ModalComp from '../components/Modal-Comp.vue'
+import { useStore } from 'vuex'
 export default {
-  components: { Vue3Lottie },
+  components: { Vue3Lottie, ModalComp },
   setup() {
     const Book = ref(BookJSON)
     const email = ref('')
     const password = ref('')
-
-    const submit = () => {}
+    const type = ref('')
+    const modal = ref(false)
+    const Type = computed(() => {
+      return type.value
+    })
+    const Modal = computed(() => {
+      return modal.value
+    })
+    const store = useStore()
+    const submit = async () => {
+      if (email.value === '' || password.value === '') {
+        alert('Please fill all details')
+      }
+      type.value = 'loader'
+      modal.value = true
+      let data = await store.dispatch('login', { email: email.value, password: password.value })
+      modal.value = false
+      if (data.error) {
+        type.value = 'error'
+        modal.value = true
+        setTimeout(() => {
+          modal.value = false
+        })
+      }
+      router.push({ name: 'home' })
+    }
     const router = useRouter()
     const redirect = () => {
       router.push({ name: 'signup' })
     }
+    onMounted(() => {
+      if (isTokenValid()) {
+        router.push({ name: 'home' })
+      }
+    })
     return {
       Book,
       email,
       password,
       submit,
-      redirect
+      redirect,
+      Type,
+      Modal
     }
   }
 }

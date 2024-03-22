@@ -23,7 +23,6 @@
         ></path>
       </g>
     </svg>
-
     <div class="flex flex-col items-center -mt-8">
       <img
         src="../assets/language/js.png"
@@ -59,52 +58,73 @@
         {{ language }}
       </h2>
     </div>
-
-    <div class="w-[94vw] ml-[3vw] mr-[3vw] mt-5">
-      <h2 class="font-primary text-2xl font-normal text-gray-700 ml-1">Description</h2>
-      <span class="font-inter text-md text-gray-600 mt-2 w-[92vw] ml-[1vw]">
-        {{ Paragraph.paragraph }}
-        <h4 class="text-blue-400 font-inter font-medium tracking-normal text-lg" @click="toggle">
-          {{ Paragraph.state === 0 ? 'show more' : 'show less' }}
-        </h4>
-      </span>
-      <h2 class="font-primary text-2xl font-normal text-gray-700 ml-1 mt-5">Working</h2>
-      <span class="font-inter text-md text-gray-600 mt-2 w-[92vw] ml-[1vw]">
-        {{ Working.working }}
-        <h4
-          class="text-blue-400 font-inter font-medium tracking-normal text-lg"
-          @click="toggleWorking"
+    <div class="flex w-screen flex-col mt-7">
+      <div class="w-screen mb-5">
+        <h2
+          class="ml-3 text-3xl font-primary font-medium text-gray-800 tracking-wide text-center mb-4"
         >
-          {{ Working.state === 0 ? 'show more' : 'show less' }}
-        </h4>
-      </span>
-    </div>
-
-    <div class="w-screen flex flex-col items-center mt-7">
-      <div
-        class="w-[96vw] h-14 rounded-xl bg-blue-500 flex flex-col justify-center items-center pt-3 pb-3 mb-6"
-        @click="interview"
-      >
-        <h2 class="text-3xl text-white font-primary font-medium tracking-wide">
-          Interview Questions
+          Basic
         </h2>
+        <div
+          v-for="(el, index) in Object.entries(Questions['basic'])"
+          :key="index"
+          class="mb-3 pl-1 pr-2"
+        >
+          <h2 class="ml-2 mb-2 text-lg font-primary font-medium text-gray-800 tracking-wide">
+            {{ el[0] }}
+          </h2>
+          <h2 class="ml-2 mb-2 text-lg font-primary font-medium text-blue-500 tracking-normal">
+            {{ el[1] }}
+          </h2>
+        </div>
       </div>
-      <div
-        class="w-[96vw] h-14 rounded-xl bg-blue-500 flex flex-col justify-center items-center pt-3 pb-3"
-        @click="featureRedirect"
-      >
-        <h2 class="text-3xl text-white font-primary font-medium tracking-wide">Features</h2>
+      <div class="w-screen mb-5">
+        <h2
+          class="ml-3 text-3xl font-primary font-medium text-gray-800 tracking-wide mb-4 text-center"
+        >
+          Intermediate
+        </h2>
+        <div
+          v-for="(el, index) in Object.entries(Questions['intermediate'])"
+          :key="index"
+          class="mb-3 pl-1 pr-2"
+        >
+          <h2 class="ml-2 mb-2 text-lg font-primary font-medium text-gray-800 tracking-wide">
+            {{ el[0] }}
+          </h2>
+          <h2 class="ml-2 mb-2 text-lg font-primary font-medium text-blue-500 tracking-normal">
+            {{ el[1] }}
+          </h2>
+        </div>
+      </div>
+      <div class="w-screen mb-5">
+        <h2
+          class="ml-3 text-3xl font-primary font-medium text-gray-800 tracking-wide text-center mb-4"
+        >
+          Advanced
+        </h2>
+        <div
+          v-for="(el, index) in Object.entries(Questions['advance'])"
+          :key="index"
+          class="mb-3 pl-1 pr-2"
+        >
+          <h2 class="ml-2 mb-2 text-lg font-primary font-medium text-gray-800 tracking-wide">
+            {{ el[0] }}
+          </h2>
+          <h2 class="ml-2 mb-2 text-lg font-primary font-medium text-blue-500 tracking-normal">
+            {{ el[1] }}
+          </h2>
+        </div>
       </div>
     </div>
-
     <modal-comp :type="Type" v-if="Modal"></modal-comp>
   </div>
 </template>
 
 <script>
 import { useRouter, useRoute } from 'vue-router'
-import { ref, onMounted, computed } from 'vue'
 import ModalComp from '../components/Modal-Comp.vue'
+import { ref, onMounted, computed } from 'vue'
 import { useStore } from 'vuex'
 export default {
   components: { ModalComp },
@@ -112,38 +132,24 @@ export default {
     const router = useRouter()
     const route = useRoute()
     const language = ref('')
-    const expand = ref(0)
-    const para = ref('')
-    const working = ref('')
-    const expandWorking = ref(0)
+    const questions = ref({ basic: {}, intermediate: {}, advance: {} })
     const type = ref('')
     const modal = ref(false)
-    const features = ref([])
     const Type = computed(() => {
       return type.value
     })
     const Modal = computed(() => {
       return modal.value
     })
-    const Features = computed(() => {
-      return features.value
-    })
-    const Working = computed(() => {
-      if (expandWorking.value == 0) {
-        return { working: working.value.slice(0, 350), state: 0 }
-      } else return { working: working.value, state: 1 }
-    })
-    const Paragraph = computed(() => {
-      if (expand.value === 0) {
-        return { paragraph: para.value.slice(0, 350), state: 0 }
+    const Questions = computed(() => {
+      if (!questions.value) {
+        return []
       }
-      return { paragraph: para.value, state: 1 }
+
+      return questions.value
     })
     const goBack = () => {
       router.push({ name: 'home' })
-    }
-    const interview = () => {
-      router.push({ name: 'interview', params: { language: language.value } })
     }
     const store = useStore()
     onMounted(async () => {
@@ -159,30 +165,15 @@ export default {
           modal.value = false
         }, 1500)
       }
-      para.value = data.result.description
-      working.value = data.result.working
+      questions.value = data.result.interview_questions
     })
-    const toggle = () => {
-      expand.value = expand.value === 0 ? 1 : 0
-    }
-    const toggleWorking = () => {
-      expandWorking.value = expandWorking.value === 0 ? 1 : 0
-    }
-    const featureRedirect = () => {
-      router.push({ name: 'langFeatures', params: { language: language.value } })
-    }
     return {
-      goBack,
-      language,
-      Paragraph,
-      toggle,
       Type,
       Modal,
-      Features,
-      Working,
-      toggleWorking,
-      interview,
-      featureRedirect
+      Questions,
+      goBack,
+      questions,
+      language
     }
   }
 }
