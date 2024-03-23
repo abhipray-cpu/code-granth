@@ -8,6 +8,7 @@ const app = createApp(App)
 import store from './stores/index'
 import Vue3Prism from 'vue3-prism/lib/Vue3Prism.common.js'
 import 'vue3-prism/lib/Vue3Prism.css'
+import './registerServiceWorker'
 app.use(Vue3Prism)
 app.use(router)
 app.use(Vue3Lottie)

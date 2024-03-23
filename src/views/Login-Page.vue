@@ -13,7 +13,7 @@
         class="w-90vw h-14 mb-8 p-4 bg-blue-200 rounded-2xl custom-shadow focus:outline-none focus:ring-1 focus:ring-yellow-300 text-xl text-gray-600"
       />
       <input
-        type="pass"
+        type="password"
         placeholder="password"
         v-model="password"
         class="w-90vw h-14 mb-6 p-4 bg-blue-200 rounded-2xl custom-shadow focus:outline-none focus:ring-1 focus:ring-yellow-300 text-xl text-gray-700"

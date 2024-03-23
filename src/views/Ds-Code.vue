@@ -26,7 +26,7 @@
         </g>
       </svg>
       <div class="flex flex-col items-center -mt-10">
-        <h2 class="font-primary text-2xl font-medium text-gray-700 tracking-wide mt-2">
+        <h2 class="font-primary text-2xl font-medium text-gray-700 tracking-wide mt-2 w-48">
           {{ code.toUpperCase() }}
         </h2>
       </div>
